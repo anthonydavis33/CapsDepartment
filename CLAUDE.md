@@ -26,6 +26,27 @@ Top-down extraction roguelike with a **food/cooking theme**. Inspirations: Bindi
 
 ---
 
+## Dish & Sub-slot Structure
+
+| Input | Dish | Sub-slots |
+|-------|------|-----------|
+| Attack1 | Main Dish | Protein · Carb · Extra · Topping · Spice ×4 |
+| Attack2 | Appetizer | Protein · Carb · Topping · Spice ×4 |
+| Dodge | Dessert | Base · Sweetener · Texture · Garnish |
+| Movement | Side | Base · Spice ×2 |
+| Potion | Drink | Liquid · Flavor · Enhancement |
+
+## Reaction System
+
+Reactions are **dish-scoped**: all required food tags must be present within the **same dish** to fire. Dairy in Main Dish + acid in Appetizer = no reaction. Both in Main Dish = Curdled fires. This is intentional — players can avoid reactions by spreading ingredients across dishes, or trigger them deliberately.
+
+Each `UReactionDataAsset` defines:
+- `RequiredFoodTags` — all must be present in the dish
+- `BlockingFoodTags` — any one suppresses the reaction
+- `ApplicableDishTypes` — optional scope restriction (empty = any dish)
+- `ReactionEffect` — GAS GameplayEffect applied on top of base dish effects
+- `bIsPositive` — for recipe book display only
+
 ## Cooking Station System (Noita-style wand builder)
 
 The core build mechanic. At the hub cooking station, the player has named **slots**:

@@ -8,7 +8,9 @@
 #include "ReactionDataAsset.generated.h"
 
 // A single emergent reaction that fires when the right food tag combination
-// is present across any dish at meal-eat time.
+// is present WITHIN A SINGLE DISH at meal-eat time.
+// The resolver runs per-dish: dairy + acid both in the Main Dish = Curdled fires.
+// Dairy in Main, acid in Appetizer = no reaction. Scope is intentional.
 // Examples: Dairy + Acid = Curdled, Protein + Heat + Fat = Maillard, etc.
 UCLASS(BlueprintType)
 class CAPS_API UReactionDataAsset : public UPrimaryDataAsset
@@ -22,19 +24,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Reaction")
 	FText Description;
 
-	// All of these tags must be present across the meal for the reaction to fire.
+	// All of these tags must be present within the same dish for the reaction to fire.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Reaction|Trigger")
 	FGameplayTagContainer RequiredFoodTags;
 
-	// If any of these tags are present the reaction is suppressed.
-	// Lets you define "Curdled doesn't fire if you also have heat" etc.
+	// If any of these tags are present in the same dish, the reaction is suppressed.
+	// e.g. "Curdled doesn't fire if the dish also contains Heat."
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Reaction|Trigger")
 	FGameplayTagContainer BlockingFoodTags;
 
-	// Optional: reaction only fires if the ingredient is in a specific dish.
-	// Empty = fires regardless of which dish the tags come from.
+	// Which dish types this reaction can fire in. Empty = any dish.
+	// Use this to restrict reactions that only make culinary sense in certain dishes
+	// (e.g. a dessert caramelisation reaction shouldn't fire in a meat main).
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Reaction|Trigger")
-	TArray<ECookingSlot> RequiredSlots;
+	TArray<ECookingSlot> ApplicableDishTypes;
 
 	// The GAS effect applied to the player when this reaction fires.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Reaction|Effect")
