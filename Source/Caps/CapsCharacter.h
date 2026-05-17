@@ -4,45 +4,42 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AbilitySystemInterface.h"
 #include "CapsCharacter.generated.h"
 
 class UCameraComponent;
 class USpringArmComponent;
+class UCapsAbilitySystemComponent;
+class UCapsAttributeSet;
 
-/**
- *  A controllable top-down perspective character
- */
 UCLASS(abstract)
-class ACapsCharacter : public ACharacter
+class ACapsCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 private:
-
-	/** Top down camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UCameraComponent> TopDownCameraComponent;
 
-	/** Camera boom positioning the camera above the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<USpringArmComponent> CameraBoom;
 
-public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Abilities", meta=(AllowPrivateAccess="true"))
+	TObjectPtr<UCapsAbilitySystemComponent> AbilitySystemComponent;
 
-	/** Constructor */
+	UPROPERTY()
+	TObjectPtr<UCapsAttributeSet> AttributeSet;
+
+public:
 	ACapsCharacter();
 
-	/** Initialization */
 	virtual void BeginPlay() override;
-
-	/** Update */
 	virtual void Tick(float DeltaSeconds) override;
 
-	/** Returns the camera component **/
+	// IAbilitySystemInterface
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	UCapsAttributeSet* GetAttributeSet() const { return AttributeSet.Get(); }
 	UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent.Get(); }
-
-	/** Returns the Camera Boom component **/
 	USpringArmComponent* GetCameraBoom() const { return CameraBoom.Get(); }
-
 };
-

@@ -20,20 +20,14 @@ public class Caps : ModuleRules
 			"GameplayStateTreeModule",
 			"Niagara",
 			"UMG",
-			"Slate"
+			"Slate",
+			"SlateCore",
+			"GameplayAbilities",
+			"GameplayTags",
+			"GameplayTasks"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
-
-		PublicIncludePaths.AddRange(new string[] {
-			"Caps",
-			"Caps/Variant_Strategy",
-			"Caps/Variant_Strategy/UI",
-			"Caps/Variant_TwinStick",
-			"Caps/Variant_TwinStick/AI",
-			"Caps/Variant_TwinStick/Gameplay",
-			"Caps/Variant_TwinStick/UI"
-		});
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
