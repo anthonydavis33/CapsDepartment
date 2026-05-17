@@ -167,6 +167,17 @@ Source/[ProjectName]/
 
 ---
 
+## Planned Post-MVP: Preparation System
+
+Ingredients marked `bIsPreparedIngredient = true` cannot drop from enemies — they are crafted in the hub. The preparation system works as follows:
+
+- Player combines ingredients to create a preparation recipe (e.g. acid + spice + oil = Marinade)
+- Marinade is applied to a Protein (e.g. Steak) and placed in the hub fridge/pantry
+- After X runs it becomes available as a new ingredient (e.g. Marinated Steak)
+- Marinated Steak is then a regular `UIngredientDataAsset` that enters the normal cooking flow
+
+**Architecture note:** The cooking system needs zero changes — marinated steak is just another ingredient from its perspective. The preparation layer sits between the hub inventory and the cooking station, producing ingredients via a run-countdown queue. Build after hub + inventory + runs are working.
+
 ## Design Decisions Still Open
 
 - Combat feel for Attack1 / Attack2 (melee vs ranged, cooldowns, etc.) — TBD

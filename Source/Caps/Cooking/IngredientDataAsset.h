@@ -61,6 +61,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ingredient|Reactions")
 	FGameplayTagContainer FoodTags;
 
+	// ── Preparation System (post-MVP) ────────────────────────────────────────
+
+	// If true, this ingredient cannot drop from enemies — it must be crafted
+	// in the hub preparation queue (fridge/pantry). Loot tables check this flag.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ingredient|Preparation")
+	bool bIsPreparedIngredient = false;
+
 	// ── Future: Procedural Dish Display ───────────────────────────────────────
 
 	// Broad category used to resolve dish archetype visuals (Protein, Carb, etc).
