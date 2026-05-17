@@ -41,3 +41,23 @@ enum class ESubSlotType : uint8
 // Food category tags used by the reaction system.
 // Applied as GameplayTags on ingredients — defined in DefaultGameplayTags.ini.
 // Examples: Food.Category.Dairy, Food.Category.Acid, Food.Category.Citrus, etc.
+
+// One ingredient occupying one position in one dish at the cooking station.
+USTRUCT(BlueprintType)
+struct FSlottedIngredient
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FName IngredientID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	ECookingSlot DishSlot = ECookingSlot::MainDish;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	ESubSlotType SubSlot = ESubSlotType::Protein;
+
+	// Position within a multi-ingredient sub-slot (e.g. Spice index 0-3).
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 SubSlotIndex = 0;
+};
