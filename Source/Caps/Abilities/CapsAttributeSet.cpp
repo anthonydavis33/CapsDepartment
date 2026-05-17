@@ -1,4 +1,4 @@
-#include "Abilities/CapsAttributeSet.h"
+#include "CapsAttributeSet.h"
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
 
