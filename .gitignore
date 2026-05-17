@@ -22,6 +22,7 @@ Saved/
 # =====================
 
 # Visual Studio
+.vsconfig
 *.VC.db
 *.VC.VC.opendb
 *.opensdf
