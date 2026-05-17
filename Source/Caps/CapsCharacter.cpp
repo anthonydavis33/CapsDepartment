@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Abilities/CapsAbilitySystemComponent.h"
 #include "Abilities/CapsAttributeSet.h"
+#include "Items/CapsInventoryComponent.h"
 
 ACapsCharacter::ACapsCharacter()
 {
@@ -37,6 +38,8 @@ ACapsCharacter::ACapsCharacter()
 
 	// AttributeSet registers itself with the ASC automatically on construction
 	AttributeSet = CreateDefaultSubobject<UCapsAttributeSet>(TEXT("AttributeSet"));
+
+	InventoryComponent = CreateDefaultSubobject<UCapsInventoryComponent>(TEXT("InventoryComponent"));
 
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;

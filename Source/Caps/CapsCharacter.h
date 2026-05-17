@@ -11,6 +11,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class UCapsAbilitySystemComponent;
 class UCapsAttributeSet;
+class UCapsInventoryComponent;
 
 UCLASS(abstract)
 class ACapsCharacter : public ACharacter, public IAbilitySystemInterface
@@ -30,6 +31,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<UCapsAttributeSet> AttributeSet;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowPrivateAccess="true"))
+	TObjectPtr<UCapsInventoryComponent> InventoryComponent;
+
 public:
 	ACapsCharacter();
 
@@ -40,6 +44,7 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	UCapsAttributeSet* GetAttributeSet() const { return AttributeSet.Get(); }
+	UCapsInventoryComponent* GetInventoryComponent() const { return InventoryComponent.Get(); }
 	UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent.Get(); }
 	USpringArmComponent* GetCameraBoom() const { return CameraBoom.Get(); }
 };
