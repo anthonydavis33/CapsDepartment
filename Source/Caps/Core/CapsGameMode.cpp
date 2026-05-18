@@ -5,6 +5,7 @@
 #include "Characters/CapsSecondaryWeaponComponent.h"
 #include "Abilities/CapsAbilitySystemComponent.h"
 #include "Dungeon/CapsDungeonGenerator.h"
+#include "Items/CapsInventoryComponent.h"
 #include "CapsCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -24,6 +25,14 @@ void ACapsGameMode::BeginPlay()
 	}
 	else
 	{
+		// Hub: restore the player's ingredient stock from the last save.
+		if (UCapsGameInstance* GI = UCapsGameInstance::Get(this))
+		{
+			APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+			ACapsCharacter* Character = PC ? Cast<ACapsCharacter>(PC->GetPawn()) : nullptr;
+			if (Character)
+				GI->RestoreInventoryFromSave(Character->GetInventoryComponent());
+		}
 		BP_OnHubReady();
 	}
 }
@@ -48,7 +57,16 @@ void ACapsGameMode::BeginDungeonTransition()
 void ACapsGameMode::ReturnToHub()
 {
 	if (UCapsGameInstance* GI = UCapsGameInstance::Get(this))
+	{
 		GI->NotifyRunEnded();
+
+		// Save the player's current inventory before the level unloads.
+		// Grabs the pawn here because it's still alive at this call site
+		// (extraction trigger or death handler calls us before any transition).
+		APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+		ACapsCharacter* Character = PC ? Cast<ACapsCharacter>(PC->GetPawn()) : nullptr;
+		GI->SaveCurrentRun(Character ? Character->GetInventoryComponent() : nullptr);
+	}
 
 	BP_OnTransitionToHub();
 

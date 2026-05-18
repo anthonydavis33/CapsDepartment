@@ -2,9 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Core/CapsRunSaveGame.h"
 #include "CapsGameInstance.generated.h"
 
 class UCapsCharacterDataAsset;
+class UCapsInventoryComponent;
 
 UENUM(BlueprintType)
 enum class ECapsRunState : uint8
@@ -28,6 +30,8 @@ public:
 	// ── Static accessor ───────────────────────────────────────────────────────
 
 	static UCapsGameInstance* Get(const UObject* WorldContextObject);
+
+	virtual void Init() override;
 
 	// ── Character selection ───────────────────────────────────────────────────
 
@@ -56,4 +60,27 @@ public:
 	// Call after a run ends (extraction or death) to update progression flags.
 	UFUNCTION(BlueprintCallable, Category="Progression")
 	void NotifyRunEnded();
+
+	// ── Save / Load ───────────────────────────────────────────────────────────
+
+	// Snapshot BaseStock from Inventory + current flags and flush to disk.
+	// Call this before every OpenLevel (ReturnToHub, death, extraction).
+	UFUNCTION(BlueprintCallable, Category="Save")
+	void SaveCurrentRun(UCapsInventoryComponent* Inventory);
+
+	// Copy BaseStock from the last save into Inventory.
+	// Call in hub-level BeginPlay once the player pawn is ready.
+	UFUNCTION(BlueprintCallable, Category="Save")
+	void RestoreInventoryFromSave(UCapsInventoryComponent* Inventory) const;
+
+	// Direct access for codex / recipe book UI.
+	UFUNCTION(BlueprintPure, Category="Save")
+	UCapsRunSaveGame* GetActiveSave() const { return ActiveSave.Get(); }
+
+private:
+	// In-memory save object. Always valid after Init().
+	UPROPERTY()
+	TObjectPtr<UCapsRunSaveGame> ActiveSave;
+
+	void LoadSaveData();
 };

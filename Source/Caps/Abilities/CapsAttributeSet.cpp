@@ -10,6 +10,7 @@ UCapsAttributeSet::UCapsAttributeSet()
 	InitMoveSpeed(600.f);
 	InitProjectileCount(1.f);
 	InitAttackRadius(1.f);
+	InitPotionCharges(0.f);
 }
 
 void UCapsAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -30,6 +31,8 @@ void UCapsAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
 		NewValue = FMath::Max(NewValue, 1.f);
 	else if (Attribute == GetAttackRadiusAttribute())
 		NewValue = FMath::Max(NewValue, 0.1f);
+	else if (Attribute == GetPotionChargesAttribute())
+		NewValue = FMath::Max(NewValue, 0.f);
 }
 
 void UCapsAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)

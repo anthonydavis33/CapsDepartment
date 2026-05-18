@@ -55,6 +55,14 @@ public:
 	FGameplayAttributeData AttackRadius;
 	ATTRIBUTE_ACCESSORS(UCapsAttributeSet, AttackRadius)
 
+	// Number of potion uses remaining for this run. Set by a GE applied at run start
+	// (driven by the Drink dish configuration). The DrinkPotion ability checks this > 0
+	// before activating and decrements it via an Instant GE on success.
+	// Default 0. Clamped to [0, ∞].
+	UPROPERTY(BlueprintReadOnly, Category="Attributes|Potion")
+	FGameplayAttributeData PotionCharges;
+	ATTRIBUTE_ACCESSORS(UCapsAttributeSet, PotionCharges)
+
 protected:
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth);
