@@ -8,6 +8,8 @@ UCapsAttributeSet::UCapsAttributeSet()
 	InitMaxHealth(100.f);
 	InitAttackDamage(10.f);
 	InitMoveSpeed(600.f);
+	InitProjectileCount(1.f);
+	InitAttackRadius(1.f);
 }
 
 void UCapsAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -23,9 +25,11 @@ void UCapsAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 	if (Attribute == GetHealthAttribute())
-	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
-	}
+	else if (Attribute == GetProjectileCountAttribute())
+		NewValue = FMath::Max(NewValue, 1.f);
+	else if (Attribute == GetAttackRadiusAttribute())
+		NewValue = FMath::Max(NewValue, 0.1f);
 }
 
 void UCapsAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)

@@ -14,6 +14,7 @@ class UCapsAbilitySystemComponent;
 class UCapsAttributeSet;
 class UCapsInventoryComponent;
 class UCapsGameplayAbility;
+class UCapsSecondaryWeaponComponent;
 
 UCLASS(abstract)
 class ACapsCharacter : public ACharacter, public IAbilitySystemInterface
@@ -36,6 +37,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UCapsInventoryComponent> InventoryComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Weapon", meta=(AllowPrivateAccess="true"))
+	TObjectPtr<UCapsSecondaryWeaponComponent> SecondaryWeaponComponent;
+
 public:
 	ACapsCharacter();
 
@@ -47,14 +51,15 @@ public:
 
 	UCapsAttributeSet* GetAttributeSet() const { return AttributeSet.Get(); }
 	UCapsInventoryComponent* GetInventoryComponent() const { return InventoryComponent.Get(); }
+	UCapsSecondaryWeaponComponent* GetSecondaryWeaponComponent() const { return SecondaryWeaponComponent.Get(); }
 	UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent.Get(); }
 	USpringArmComponent* GetCameraBoom() const { return CameraBoom.Get(); }
 
 	bool IsAlive() const { return !bIsDead; }
 
-	// Abilities to grant when the character spawns. Assign Blueprint ability
-	// subclasses here in the player's Blueprint Details panel.
-	// Each ability's InputID determines which action triggers it.
+	// Generic abilities granted regardless of which character is selected
+	// (utility abilities, dodge roll, etc.). Character-specific abilities
+	// come from UCapsCharacterDataAsset and are applied by ACapsGameMode.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Abilities")
 	TArray<TSubclassOf<UCapsGameplayAbility>> DefaultAbilities;
 

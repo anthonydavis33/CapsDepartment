@@ -256,6 +256,17 @@ TArray<FMinimapRoomEntry> ACapsDungeonGenerator::GetMinimapData() const
 	const int32 RevealRange = UCapsGameSettings::Get()->SafeRoomRevealRange;
 
 	TArray<FMinimapRoomEntry> Result;
+
+	// Hub is always visible at index -1: sealed, never current, never an enemy dot target.
+	{
+		FMinimapRoomEntry& HubEntry      = Result.AddDefaulted_GetRef();
+		HubEntry.RoomIndex               = -1;
+		HubEntry.RoomType                = ERoomType::Hub;
+		HubEntry.bVisited                = true;
+		HubEntry.bIsCurrent              = false;
+		HubEntry.bRevealedByProximity    = false;
+	}
+
 	for (const auto& Pair : KnownRoomTypes)
 	{
 		const int32 RoomIdx   = Pair.Key;

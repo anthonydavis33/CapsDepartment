@@ -11,6 +11,7 @@ enum class ERoomType : uint8
 	Treasure UMETA(DisplayName="Treasure"),
 	Rest     UMETA(DisplayName="Rest"),
 	Safe     UMETA(DisplayName="Safe"),  // Contains extraction trigger. No reinforcements.
+	Hub      UMETA(DisplayName="Hub"),   // Starting area. Always visible on minimap, sealed once run begins.
 };
 
 UENUM(BlueprintType)

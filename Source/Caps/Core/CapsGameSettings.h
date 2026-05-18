@@ -2,7 +2,28 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DeveloperSettings.h"
+#include "GameplayTagContainer.h"
+#include "GameplayEffect.h"
 #include "CapsGameSettings.generated.h"
+
+class UCapsCharacterDataAsset;
+
+// Maps one food effect gameplay tag to the GAS GameplayEffect applied to the
+// hit target when a weapon connects. Populate in Project Settings → Caps Dept.
+// Example: Tag = "Food.Effect.Fire" → HitEffect = GE_Burn (duration DoT on target)
+USTRUCT(BlueprintType)
+struct FFoodHitEffectEntry
+{
+	GENERATED_BODY()
+
+	// The tag checked on the attacking character's ASC (e.g. "Food.Effect.Fire").
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag FoodTag;
+
+	// Applied to the HIT TARGET when the character has FoodTag active.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UGameplayEffect> HitEffect;
+};
 
 // Project-wide designer settings. Edit via Project Settings → Caps Dept.
 // Values persist in DefaultGame.ini — add new entries without recompiling.
@@ -33,6 +54,31 @@ public:
 	// Set to 0 to only show visited rooms.
 	UPROPERTY(Config, EditAnywhere, Category="Dungeon|Minimap", meta=(ClampMin="0"))
 	int32 SafeRoomRevealRange = 3;
+
+	// ── Characters ────────────────────────────────────────────────────────────
+
+	// All playable characters shown on the character select screen.
+	// Add new UCapsCharacterDataAsset entries here — no code change required.
+	UPROPERTY(Config, EditAnywhere, Category="Characters")
+	TArray<TSoftObjectPtr<UCapsCharacterDataAsset>> AvailableCharacters;
+
+	// ── Combat | Food Effects ─────────────────────────────────────────────────
+
+	// Maps food effect tags to on-hit GameplayEffects applied to hit targets.
+	// UCapsWeaponAbility::ApplyFoodEffectsOnHit() iterates this list.
+	// Add a new row to wire a new food tag → GE without recompiling.
+	UPROPERTY(Config, EditAnywhere, Category="Combat|FoodEffects")
+	TArray<FFoodHitEffectEntry> FoodHitEffects;
+
+	// ── Level Names ───────────────────────────────────────────────────────────
+
+	// Name of the hub level (used by OpenLevel after extraction / death).
+	UPROPERTY(Config, EditAnywhere, Category="Levels")
+	FName HubLevelName = FName("Hub");
+
+	// Name of the dungeon level (used by OpenLevel when starting a run).
+	UPROPERTY(Config, EditAnywhere, Category="Levels")
+	FName DungeonLevelName = FName("Dungeon");
 
 	// ── Dungeon | Reinforcements ───────────────────────────────────────────────
 	//

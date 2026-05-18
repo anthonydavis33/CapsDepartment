@@ -41,6 +41,20 @@ public:
 	FGameplayAttributeData MoveSpeed;
 	ATTRIBUTE_ACCESSORS(UCapsAttributeSet, MoveSpeed)
 
+	// Projectiles fired per attack activation. Food / character traits can raise this
+	// (e.g. Triple Shot sets it to 3). Weapon abilities read this and spawn N projectiles.
+	// Default 1. Clamped to [1, ∞].
+	UPROPERTY(BlueprintReadOnly, Category="Attributes|Combat")
+	FGameplayAttributeData ProjectileCount;
+	ATTRIBUTE_ACCESSORS(UCapsAttributeSet, ProjectileCount)
+
+	// Multiplier applied to hit-sphere radius and projectile scale.
+	// Default 1.0. Food can increase this to make attacks cover more area.
+	// Clamped to [0.1, ∞].
+	UPROPERTY(BlueprintReadOnly, Category="Attributes|Combat")
+	FGameplayAttributeData AttackRadius;
+	ATTRIBUTE_ACCESSORS(UCapsAttributeSet, AttackRadius)
+
 protected:
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth);

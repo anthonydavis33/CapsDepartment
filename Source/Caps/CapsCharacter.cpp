@@ -8,6 +8,7 @@
 #include "Abilities/CapsAbilitySystemComponent.h"
 #include "Abilities/CapsAttributeSet.h"
 #include "Abilities/CapsGameplayAbility.h"
+#include "Characters/CapsSecondaryWeaponComponent.h"
 #include "Items/CapsInventoryComponent.h"
 
 ACapsCharacter::ACapsCharacter()
@@ -41,6 +42,8 @@ ACapsCharacter::ACapsCharacter()
 	AttributeSet = CreateDefaultSubobject<UCapsAttributeSet>(TEXT("AttributeSet"));
 
 	InventoryComponent = CreateDefaultSubobject<UCapsInventoryComponent>(TEXT("InventoryComponent"));
+
+	SecondaryWeaponComponent = CreateDefaultSubobject<UCapsSecondaryWeaponComponent>(TEXT("SecondaryWeaponComponent"));
 
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -78,6 +81,11 @@ void ACapsCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
 void ACapsCharacter::HandleDeath()
 {
 	bIsDead = true;
+
+	// Block all ability activation immediately.
+	if (AbilitySystemComponent)
+		AbilitySystemComponent->AddLooseGameplayTag(
+			FGameplayTag::RequestGameplayTag(FName("State.Dead")));
 
 	if (InventoryComponent)
 		InventoryComponent->HandleDeath();
