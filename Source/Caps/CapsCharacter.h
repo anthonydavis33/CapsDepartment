@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayEffectTypes.h"
 #include "CapsCharacter.generated.h"
 
 class UCameraComponent;
@@ -47,4 +48,17 @@ public:
 	UCapsInventoryComponent* GetInventoryComponent() const { return InventoryComponent.Get(); }
 	UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent.Get(); }
 	USpringArmComponent* GetCameraBoom() const { return CameraBoom.Get(); }
+
+	bool IsAlive() const { return !bIsDead; }
+
+protected:
+	// Override in Blueprint to play death screen, trigger respawn, or transition to hub.
+	UFUNCTION(BlueprintImplementableEvent, Category="Character")
+	void BP_OnDeath();
+
+private:
+	bool bIsDead = false;
+
+	void OnHealthChanged(const FOnAttributeChangeData& Data);
+	void HandleDeath();
 };

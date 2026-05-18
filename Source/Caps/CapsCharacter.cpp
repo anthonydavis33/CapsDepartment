@@ -52,7 +52,29 @@ void ACapsCharacter::BeginPlay()
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			UCapsAttributeSet::GetHealthAttribute())
+			.AddUObject(this, &ACapsCharacter::OnHealthChanged);
 	}
+}
+
+void ACapsCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
+{
+	if (bIsDead || Data.NewValue > 0.f) return;
+	HandleDeath();
+}
+
+void ACapsCharacter::HandleDeath()
+{
+	bIsDead = true;
+
+	if (InventoryComponent)
+		InventoryComponent->HandleDeath();
+
+	GetCharacterMovement()->DisableMovement();
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	BP_OnDeath();
 }
 
 void ACapsCharacter::Tick(float DeltaSeconds)
