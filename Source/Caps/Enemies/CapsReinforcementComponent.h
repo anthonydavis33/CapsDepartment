@@ -4,6 +4,8 @@
 #include "Components/ActorComponent.h"
 #include "CapsReinforcementComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWaveIncoming);
+
 class ACapsEnemyBase;
 class ACapsDungeonGenerator;
 
@@ -36,7 +38,7 @@ public:
 
 	// Fired when a wave is about to spawn — use in Blueprint to show a warning UI.
 	UPROPERTY(BlueprintAssignable, Category="Reinforcement")
-	FSimpleMulticastDelegate OnWaveIncoming;
+	FOnWaveIncoming OnWaveIncoming;
 
 	// Call when a room clears. Registers it as a new wave source.
 	void NotifyRoomCleared(int32 RoomIndex);
