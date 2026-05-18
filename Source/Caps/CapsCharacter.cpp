@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Abilities/CapsAbilitySystemComponent.h"
 #include "Abilities/CapsAttributeSet.h"
+#include "Abilities/CapsGameplayAbility.h"
 #include "Items/CapsInventoryComponent.h"
 
 ACapsCharacter::ACapsCharacter()
@@ -55,6 +56,16 @@ void ACapsCharacter::BeginPlay()
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			UCapsAttributeSet::GetHealthAttribute())
 			.AddUObject(this, &ACapsCharacter::OnHealthChanged);
+
+		GrantDefaultAbilities();
+	}
+}
+
+void ACapsCharacter::GrantDefaultAbilities()
+{
+	for (const TSubclassOf<UCapsGameplayAbility>& AbilityClass : DefaultAbilities)
+	{
+		AbilitySystemComponent->GrantAbility(AbilityClass);
 	}
 }
 

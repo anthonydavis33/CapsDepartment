@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
+#include "Abilities/CapsAbilityInputID.h"
 #include "CapsPlayerController.generated.h"
 
 class UInputMappingContext;
 class UInputAction;
+class UCapsAbilitySystemComponent;
 
 UCLASS(abstract)
 class ACapsPlayerController : public APlayerController
@@ -46,4 +48,12 @@ private:
 	void OnAttack2();
 	void OnDodge();
 	void OnDrinkPotion();
+
+	// For held abilities: fires AbilityLocalInputReleased when the key comes up.
+	void OnAttack1Released();
+	void OnAttack2Released();
+	void OnDodgeReleased();
+	void OnDrinkPotionReleased();
+
+	UCapsAbilitySystemComponent* GetPlayerASC() const;
 };

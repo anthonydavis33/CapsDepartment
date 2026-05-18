@@ -5,6 +5,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/Pawn.h"
+#include "Abilities/CapsAbilitySystemComponent.h"
+#include "CapsCharacter.h"
 #include "Caps.h"
 
 ACapsPlayerController::ACapsPlayerController()
@@ -23,11 +25,19 @@ void ACapsPlayerController::SetupInputComponent()
 
 	if (UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent))
 	{
-		EIC->BindAction(MoveAction,        ETriggerEvent::Triggered, this, &ACapsPlayerController::OnMove);
-		EIC->BindAction(Attack1Action,     ETriggerEvent::Started,   this, &ACapsPlayerController::OnAttack1);
-		EIC->BindAction(Attack2Action,     ETriggerEvent::Started,   this, &ACapsPlayerController::OnAttack2);
-		EIC->BindAction(DodgeAction,       ETriggerEvent::Started,   this, &ACapsPlayerController::OnDodge);
-		EIC->BindAction(DrinkPotionAction, ETriggerEvent::Started,   this, &ACapsPlayerController::OnDrinkPotion);
+		EIC->BindAction(MoveAction,        ETriggerEvent::Triggered,  this, &ACapsPlayerController::OnMove);
+
+		EIC->BindAction(Attack1Action,     ETriggerEvent::Started,    this, &ACapsPlayerController::OnAttack1);
+		EIC->BindAction(Attack1Action,     ETriggerEvent::Completed,  this, &ACapsPlayerController::OnAttack1Released);
+
+		EIC->BindAction(Attack2Action,     ETriggerEvent::Started,    this, &ACapsPlayerController::OnAttack2);
+		EIC->BindAction(Attack2Action,     ETriggerEvent::Completed,  this, &ACapsPlayerController::OnAttack2Released);
+
+		EIC->BindAction(DodgeAction,       ETriggerEvent::Started,    this, &ACapsPlayerController::OnDodge);
+		EIC->BindAction(DodgeAction,       ETriggerEvent::Completed,  this, &ACapsPlayerController::OnDodgeReleased);
+
+		EIC->BindAction(DrinkPotionAction, ETriggerEvent::Started,    this, &ACapsPlayerController::OnDrinkPotion);
+		EIC->BindAction(DrinkPotionAction, ETriggerEvent::Completed,  this, &ACapsPlayerController::OnDrinkPotionReleased);
 	}
 	else
 	{
@@ -46,22 +56,57 @@ void ACapsPlayerController::OnMove(const FInputActionValue& Value)
 	}
 }
 
+UCapsAbilitySystemComponent* ACapsPlayerController::GetPlayerASC() const
+{
+	if (const ACapsCharacter* Char = Cast<ACapsCharacter>(GetPawn()))
+		return Cast<UCapsAbilitySystemComponent>(Char->GetAbilitySystemComponent());
+	return nullptr;
+}
+
 void ACapsPlayerController::OnAttack1()
 {
-	UE_LOG(LogCaps, Log, TEXT("Attack1 — stub"));
+	if (UCapsAbilitySystemComponent* ASC = GetPlayerASC())
+		ASC->PressInputID(ECapsAbilityInputID::Attack1);
+}
+
+void ACapsPlayerController::OnAttack1Released()
+{
+	if (UCapsAbilitySystemComponent* ASC = GetPlayerASC())
+		ASC->ReleaseInputID(ECapsAbilityInputID::Attack1);
 }
 
 void ACapsPlayerController::OnAttack2()
 {
-	UE_LOG(LogCaps, Log, TEXT("Attack2 — stub"));
+	if (UCapsAbilitySystemComponent* ASC = GetPlayerASC())
+		ASC->PressInputID(ECapsAbilityInputID::Attack2);
+}
+
+void ACapsPlayerController::OnAttack2Released()
+{
+	if (UCapsAbilitySystemComponent* ASC = GetPlayerASC())
+		ASC->ReleaseInputID(ECapsAbilityInputID::Attack2);
 }
 
 void ACapsPlayerController::OnDodge()
 {
-	UE_LOG(LogCaps, Log, TEXT("Dodge — stub"));
+	if (UCapsAbilitySystemComponent* ASC = GetPlayerASC())
+		ASC->PressInputID(ECapsAbilityInputID::Dodge);
+}
+
+void ACapsPlayerController::OnDodgeReleased()
+{
+	if (UCapsAbilitySystemComponent* ASC = GetPlayerASC())
+		ASC->ReleaseInputID(ECapsAbilityInputID::Dodge);
 }
 
 void ACapsPlayerController::OnDrinkPotion()
 {
-	UE_LOG(LogCaps, Log, TEXT("DrinkPotion — stub"));
+	if (UCapsAbilitySystemComponent* ASC = GetPlayerASC())
+		ASC->PressInputID(ECapsAbilityInputID::DrinkPotion);
+}
+
+void ACapsPlayerController::OnDrinkPotionReleased()
+{
+	if (UCapsAbilitySystemComponent* ASC = GetPlayerASC())
+		ASC->ReleaseInputID(ECapsAbilityInputID::DrinkPotion);
 }

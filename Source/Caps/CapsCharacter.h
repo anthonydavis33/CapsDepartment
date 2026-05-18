@@ -13,6 +13,7 @@ class USpringArmComponent;
 class UCapsAbilitySystemComponent;
 class UCapsAttributeSet;
 class UCapsInventoryComponent;
+class UCapsGameplayAbility;
 
 UCLASS(abstract)
 class ACapsCharacter : public ACharacter, public IAbilitySystemInterface
@@ -51,6 +52,12 @@ public:
 
 	bool IsAlive() const { return !bIsDead; }
 
+	// Abilities to grant when the character spawns. Assign Blueprint ability
+	// subclasses here in the player's Blueprint Details panel.
+	// Each ability's InputID determines which action triggers it.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Abilities")
+	TArray<TSubclassOf<UCapsGameplayAbility>> DefaultAbilities;
+
 protected:
 	// Override in Blueprint to play death screen, trigger respawn, or transition to hub.
 	UFUNCTION(BlueprintImplementableEvent, Category="Character")
@@ -61,4 +68,5 @@ private:
 
 	void OnHealthChanged(const FOnAttributeChangeData& Data);
 	void HandleDeath();
+	void GrantDefaultAbilities();
 };
