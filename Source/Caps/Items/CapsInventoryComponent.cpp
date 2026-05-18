@@ -1,6 +1,8 @@
 #include "Items/CapsInventoryComponent.h"
 #include "Cooking/IngredientDataAsset.h"
 #include "Cooking/ReactionDataAsset.h"
+#include "Core/CapsGameInstance.h"
+#include "Core/CapsRunSaveGame.h"
 #include "AbilitySystemInterface.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffect.h"
@@ -126,6 +128,20 @@ void UCapsInventoryComponent::EatMeal()
 	{
 		ApplyDishEffects(Dish, ASC);
 	}
+
+	// Record every consumed ingredient in the codex so the recipe book UI
+	// can show which slots each ingredient has been used in.
+	if (UCapsGameInstance* GI = UCapsGameInstance::Get(GetWorld()))
+	{
+		if (UCapsRunSaveGame* Save = GI->GetActiveSave())
+		{
+			for (const FSlottedIngredient& Slot : ActiveMeal)
+			{
+				if (!Slot.IngredientID.IsNone())
+					Save->RecipeBook.MarkIngredientUsed(Slot.IngredientID, Slot.DishSlot);
+			}
+		}
+	}
 }
 
 void UCapsInventoryComponent::AddRunPickup(FName IngredientID, int32 Quantity)
@@ -247,5 +263,12 @@ void UCapsInventoryComponent::ResolveReactions(ECookingSlot Dish, const FGamepla
 		UE_LOG(LogCaps, Log, TEXT("Reaction fired in %s: %s"),
 			*UEnum::GetValueAsString(Dish),
 			*Reaction->ReactionName.ToString());
+
+		// Record the discovery in the player's recipe book codex.
+		if (UCapsGameInstance* GI = UCapsGameInstance::Get(GetWorld()))
+		{
+			if (UCapsRunSaveGame* Save = GI->GetActiveSave())
+				Save->RecipeBook.MarkReactionDiscovered(Reaction->GetFName(), 0);
+		}
 	}
 }

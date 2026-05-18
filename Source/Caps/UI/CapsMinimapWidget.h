@@ -46,6 +46,11 @@ private:
 	UPROPERTY()
 	TObjectPtr<ACapsDungeonGenerator> CachedGenerator;
 
+	// Most recent snapshot passed to OnRoomDataUpdated. Exposed so Blueprint
+	// can query the last known state without triggering a new refresh.
+	UPROPERTY(BlueprintReadOnly, Category="Minimap", meta=(AllowPrivateAccess="true"))
+	TArray<FMinimapRoomEntry> LastData;
+
 	float RefreshAccumulator = 0.f;
 
 	static constexpr float RefreshInterval = 0.15f;
