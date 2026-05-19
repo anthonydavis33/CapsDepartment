@@ -51,7 +51,7 @@ void UCapsGameplayAbility::FinishAbility()
 		/*bReplicateEndAbility=*/true, /*bWasCancelled=*/false);
 }
 
-void UCapsGameplayAbility::CancelAbility()
+void UCapsGameplayAbility::AbortAbility()
 {
 	if (bAbilityEnded || !CachedActorInfo) return;
 	EndAbility(CachedHandle, CachedActorInfo, CachedActivationInfo,
@@ -63,7 +63,7 @@ ACapsCharacter* UCapsGameplayAbility::GetCapsCharacter() const
 	return Cast<ACapsCharacter>(GetAvatarActorFromActorInfo());
 }
 
-UCapsAttributeSet* UCapsGameplayAbility::GetCapsAttributeSet() const
+const UCapsAttributeSet* UCapsGameplayAbility::GetCapsAttributeSet() const
 {
 	const FGameplayAbilityActorInfo* Info = GetCurrentActorInfo();
 	if (!Info || !Info->AbilitySystemComponent.IsValid()) return nullptr;

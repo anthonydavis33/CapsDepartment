@@ -69,8 +69,9 @@ protected:
 
 	// Call to cancel mid-execution (e.g. interrupted by stagger). Ends the
 	// ability and fires EndAbility with bWasCancelled = true.
+	// Named AbortAbility to avoid hiding UGameplayAbility::CancelAbility(Handle,...).
 	UFUNCTION(BlueprintCallable, Category="Ability")
-	void CancelAbility();
+	void AbortAbility();
 
 	// ── Convenience getters ────────────────────────────────────────────────────
 
@@ -81,7 +82,7 @@ protected:
 
 	// Returns the owning actor's attribute set. Works for both player and enemy.
 	UFUNCTION(BlueprintPure, Category="Ability")
-	UCapsAttributeSet* GetCapsAttributeSet() const;
+	const UCapsAttributeSet* GetCapsAttributeSet() const;
 
 private:
 	// Cached activation context so FinishAbility / CancelAbility can call EndAbility.

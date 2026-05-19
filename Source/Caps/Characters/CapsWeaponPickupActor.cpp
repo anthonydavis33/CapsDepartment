@@ -43,7 +43,7 @@ void ACapsWeaponPickupActor::OnOverlapBegin(UPrimitiveComponent* /*OverlappedCom
 
 	// Spawn a pickup for the weapon the player is dropping, at this actor's location.
 	TSubclassOf<ACapsWeaponPickupActor> DropClass =
-		SpawnedPickupClass ? SpawnedPickupClass : GetClass();
+		SpawnedPickupClass ? SpawnedPickupClass : TSubclassOf<ACapsWeaponPickupActor>(GetClass());
 
 	const TSubclassOf<UCapsGameplayAbility> DroppedWeaponClass = SecondaryComp->GetCurrentWeaponClass();
 

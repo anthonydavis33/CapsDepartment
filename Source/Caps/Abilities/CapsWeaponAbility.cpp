@@ -9,7 +9,8 @@ void UCapsWeaponAbility::ApplyFoodEffectsOnHit(AActor* HitTarget)
 	if (!HitTarget) return;
 
 	// Attacker's ASC — we check their active tags against the food effect registry.
-	UAbilitySystemComponent* AttackerASC = GetAbilitySystemComponent();
+	const FGameplayAbilityActorInfo* Info = GetCurrentActorInfo();
+	UAbilitySystemComponent* AttackerASC = Info ? Info->AbilitySystemComponent.Get() : nullptr;
 	if (!AttackerASC) return;
 
 	// Target's ASC — this is where we apply the conditional hit GEs.
