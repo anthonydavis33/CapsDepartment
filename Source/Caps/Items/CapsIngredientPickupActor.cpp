@@ -31,7 +31,7 @@ void ACapsIngredientPickupActor::OnOverlapBegin(
 	if (!IngredientID.IsNone())
 	{
 		if (UCapsInventoryComponent* Inventory = Character->GetInventoryComponent())
-			Inventory->AddRunPickup(IngredientID, Quantity);
+			Inventory->AddRunPickup(IngredientID, Quality, Quantity);
 	}
 
 	BP_OnPickedUp(Character);

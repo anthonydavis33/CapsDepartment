@@ -27,17 +27,22 @@ public:
 	// Hub inventory. Ingredients consumed when slotted, returned when unslotted.
 
 	UPROPERTY(BlueprintReadOnly, Category="Inventory")
-	TMap<FName, int32> BaseStock;
+	TMap<FIngredientInstance, int32> BaseStock;
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void AddToBaseStock(FName IngredientID, int32 Quantity = 1);
+	void AddToBaseStock(FName IngredientID, EIngredientQuality Quality = EIngredientQuality::Choice, int32 Quantity = 1);
 
 	// Returns false if not enough stock.
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	bool RemoveFromBaseStock(FName IngredientID, int32 Quantity = 1);
+	bool RemoveFromBaseStock(FName IngredientID, EIngredientQuality Quality, int32 Quantity = 1);
 
+	// Returns count for a specific quality tier.
 	UFUNCTION(BlueprintPure, Category="Inventory")
-	int32 GetBaseStockQuantity(FName IngredientID) const;
+	int32 GetBaseStockQuantity(FName IngredientID, EIngredientQuality Quality) const;
+
+	// Returns total count across all quality tiers (useful for UI display).
+	UFUNCTION(BlueprintPure, Category="Inventory")
+	int32 GetTotalBaseStockQuantity(FName IngredientID) const;
 
 	// ── Cooking Station ────────────────────────────────────────────────────────
 	// Current sub-slot configuration across all dishes.
@@ -48,7 +53,7 @@ public:
 	// Moves one unit from BaseStock into the given sub-slot.
 	// Returns false if out of stock or the sub-slot is already occupied.
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	bool SlotIngredient(FName IngredientID, ECookingSlot Dish, ESubSlotType SubSlot, int32 SubSlotIndex = 0);
+	bool SlotIngredient(FName IngredientID, EIngredientQuality Quality, ECookingSlot Dish, ESubSlotType SubSlot, int32 SubSlotIndex = 0);
 
 	// Returns the ingredient at that position to BaseStock.
 	UFUNCTION(BlueprintCallable, Category="Inventory")
@@ -69,7 +74,7 @@ public:
 
 	// Ingredients found during the current run — not yet in BaseStock.
 	UPROPERTY(BlueprintReadOnly, Category="Inventory")
-	TMap<FName, int32> RunPickups;
+	TMap<FIngredientInstance, int32> RunPickups;
 
 	// Locks in the current cooking station state as the active meal,
 	// applies GAS ingredient effects per dish, then resolves reactions.
@@ -77,7 +82,7 @@ public:
 	void EatMeal();
 
 	UFUNCTION(BlueprintCallable, Category="Inventory")
-	void AddRunPickup(FName IngredientID, int32 Quantity = 1);
+	void AddRunPickup(FName IngredientID, EIngredientQuality Quality = EIngredientQuality::Choice, int32 Quantity = 1);
 
 	// ── Extraction / Death ─────────────────────────────────────────────────────
 

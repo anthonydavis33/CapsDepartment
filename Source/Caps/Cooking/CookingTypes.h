@@ -42,6 +42,40 @@ enum class ESubSlotType : uint8
 // Applied as GameplayTags on ingredients — defined in DefaultGameplayTags.ini.
 // Examples: Food.Category.Dairy, Food.Category.Acid, Food.Category.Citrus, etc.
 
+// Quality tier of an ingredient. Maps directly to GAS GE Level (Table=1, Choice=2, Prime=3).
+// Add this to loot table drops and pickup actors as you build those systems.
+UENUM(BlueprintType)
+enum class EIngredientQuality : uint8
+{
+	Table  = 1  UMETA(DisplayName="Table"),
+	Choice = 2  UMETA(DisplayName="Choice"),
+	Prime  = 3  UMETA(DisplayName="Prime"),
+};
+
+// Compound key used as the TMap key for inventory buckets (BaseStock, RunPickups).
+// Combines IngredientID + Quality so Table Pepper and Prime Pepper are distinct stacks.
+USTRUCT(BlueprintType)
+struct FIngredientInstance
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName IngredientID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EIngredientQuality Quality = EIngredientQuality::Choice;
+
+	bool operator==(const FIngredientInstance& Other) const
+	{
+		return IngredientID == Other.IngredientID && Quality == Other.Quality;
+	}
+};
+
+inline uint32 GetTypeHash(const FIngredientInstance& Instance)
+{
+	return HashCombine(GetTypeHash(Instance.IngredientID), GetTypeHash(static_cast<uint8>(Instance.Quality)));
+}
+
 // One ingredient occupying one position in one dish at the cooking station.
 USTRUCT(BlueprintType)
 struct FSlottedIngredient
@@ -60,4 +94,9 @@ struct FSlottedIngredient
 	// Position within a multi-ingredient sub-slot (e.g. Spice index 0-3).
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 SubSlotIndex = 0;
+
+	// Quality tier — drives GE level for parametric effects.
+	// Non-scaling effects (tag grants like GE_Grant_Fire) are unaffected by quality.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EIngredientQuality Quality = EIngredientQuality::Choice;
 };

@@ -77,7 +77,7 @@ void UCapsGameInstance::RestoreInventoryFromSave(UCapsInventoryComponent* Invent
 	// as long as the inventory starts empty (which it does on a fresh pawn).
 	for (const auto& Pair : ActiveSave->BaseStock)
 	{
-		if (!Pair.Key.IsNone() && Pair.Value > 0)
-			Inventory->AddToBaseStock(Pair.Key, Pair.Value);
+		if (!Pair.Key.IngredientID.IsNone() && Pair.Value > 0)
+			Inventory->AddToBaseStock(Pair.Key.IngredientID, Pair.Key.Quality, Pair.Value);
 	}
 }

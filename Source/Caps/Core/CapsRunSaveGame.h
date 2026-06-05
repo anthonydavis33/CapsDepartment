@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
 #include "Cooking/CapsRecipeBook.h"
+#include "Cooking/CookingTypes.h"
 #include "CapsRunSaveGame.generated.h"
 
 // Persistent save data for a single player profile.
@@ -26,10 +27,10 @@ public:
 
 	// ── Inventory ─────────────────────────────────────────────────────────────
 
-	// The player's hub ingredient stock. Maps IngredientID → count.
+	// The player's hub ingredient stock. Maps IngredientInstance (ID + Quality) → count.
 	// Written from UCapsInventoryComponent::BaseStock before each hub return.
 	UPROPERTY(SaveGame)
-	TMap<FName, int32> BaseStock;
+	TMap<FIngredientInstance, int32> BaseStock;
 
 	// ── Progression ───────────────────────────────────────────────────────────
 

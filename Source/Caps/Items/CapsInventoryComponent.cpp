@@ -24,44 +24,57 @@ UCapsInventoryComponent::UCapsInventoryComponent()
 
 // ── Base Stock ────────────────────────────────────────────────────────────────
 
-void UCapsInventoryComponent::AddToBaseStock(FName IngredientID, int32 Quantity)
+void UCapsInventoryComponent::AddToBaseStock(FName IngredientID, EIngredientQuality Quality, int32 Quantity)
 {
 	if (IngredientID.IsNone() || Quantity <= 0) return;
-	BaseStock.FindOrAdd(IngredientID) += Quantity;
+	BaseStock.FindOrAdd(FIngredientInstance{IngredientID, Quality}) += Quantity;
 }
 
-bool UCapsInventoryComponent::RemoveFromBaseStock(FName IngredientID, int32 Quantity)
+bool UCapsInventoryComponent::RemoveFromBaseStock(FName IngredientID, EIngredientQuality Quality, int32 Quantity)
 {
-	int32* Current = BaseStock.Find(IngredientID);
+	const FIngredientInstance Key{IngredientID, Quality};
+	int32* Current = BaseStock.Find(Key);
 	if (!Current || *Current < Quantity) return false;
 	*Current -= Quantity;
-	if (*Current <= 0) BaseStock.Remove(IngredientID);
+	if (*Current <= 0) BaseStock.Remove(Key);
 	return true;
 }
 
-int32 UCapsInventoryComponent::GetBaseStockQuantity(FName IngredientID) const
+int32 UCapsInventoryComponent::GetBaseStockQuantity(FName IngredientID, EIngredientQuality Quality) const
 {
-	const int32* Qty = BaseStock.Find(IngredientID);
+	const int32* Qty = BaseStock.Find(FIngredientInstance{IngredientID, Quality});
 	return Qty ? *Qty : 0;
+}
+
+int32 UCapsInventoryComponent::GetTotalBaseStockQuantity(FName IngredientID) const
+{
+	int32 Total = 0;
+	for (const auto& Pair : BaseStock)
+	{
+		if (Pair.Key.IngredientID == IngredientID)
+			Total += Pair.Value;
+	}
+	return Total;
 }
 
 // ── Cooking Station ───────────────────────────────────────────────────────────
 
-bool UCapsInventoryComponent::SlotIngredient(FName IngredientID, ECookingSlot Dish, ESubSlotType SubSlot, int32 SubSlotIndex)
+bool UCapsInventoryComponent::SlotIngredient(FName IngredientID, EIngredientQuality Quality, ECookingSlot Dish, ESubSlotType SubSlot, int32 SubSlotIndex)
 {
-	if (!RemoveFromBaseStock(IngredientID, 1)) return false;
+	if (!RemoveFromBaseStock(IngredientID, Quality, 1)) return false;
 
 	for (const FSlottedIngredient& Existing : SlottedIngredients)
 	{
 		if (Existing.DishSlot == Dish && Existing.SubSlot == SubSlot && Existing.SubSlotIndex == SubSlotIndex)
 		{
-			AddToBaseStock(IngredientID, 1);
+			AddToBaseStock(IngredientID, Quality, 1);
 			return false;
 		}
 	}
 
 	FSlottedIngredient& New = SlottedIngredients.AddDefaulted_GetRef();
 	New.IngredientID  = IngredientID;
+	New.Quality       = Quality;
 	New.DishSlot      = Dish;
 	New.SubSlot       = SubSlot;
 	New.SubSlotIndex  = SubSlotIndex;
@@ -75,7 +88,7 @@ void UCapsInventoryComponent::UnslotIngredient(ECookingSlot Dish, ESubSlotType S
 		const FSlottedIngredient& S = SlottedIngredients[i];
 		if (S.DishSlot == Dish && S.SubSlot == SubSlot && S.SubSlotIndex == SubSlotIndex)
 		{
-			AddToBaseStock(S.IngredientID, 1);
+			AddToBaseStock(S.IngredientID, S.Quality, 1);
 			SlottedIngredients.RemoveAt(i);
 			return;
 		}
@@ -88,7 +101,7 @@ void UCapsInventoryComponent::ClearDish(ECookingSlot Dish)
 	{
 		if (SlottedIngredients[i].DishSlot == Dish)
 		{
-			AddToBaseStock(SlottedIngredients[i].IngredientID, 1);
+			AddToBaseStock(SlottedIngredients[i].IngredientID, SlottedIngredients[i].Quality, 1);
 			SlottedIngredients.RemoveAt(i);
 		}
 	}
@@ -144,10 +157,10 @@ void UCapsInventoryComponent::EatMeal()
 	}
 }
 
-void UCapsInventoryComponent::AddRunPickup(FName IngredientID, int32 Quantity)
+void UCapsInventoryComponent::AddRunPickup(FName IngredientID, EIngredientQuality Quality, int32 Quantity)
 {
 	if (IngredientID.IsNone() || Quantity <= 0) return;
-	RunPickups.FindOrAdd(IngredientID) += Quantity;
+	RunPickups.FindOrAdd(FIngredientInstance{IngredientID, Quality}) += Quantity;
 }
 
 // ── Extraction / Death ────────────────────────────────────────────────────────
@@ -156,7 +169,7 @@ void UCapsInventoryComponent::HandleExtraction()
 {
 	for (auto& Pair : RunPickups)
 	{
-		AddToBaseStock(Pair.Key, Pair.Value);
+		AddToBaseStock(Pair.Key.IngredientID, Pair.Key.Quality, Pair.Value);
 	}
 	RunPickups.Empty();
 	ActiveMeal.Empty();
@@ -164,8 +177,8 @@ void UCapsInventoryComponent::HandleExtraction()
 
 void UCapsInventoryComponent::HandleDeath()
 {
-	// Merge run pickups into base stock for the loss calculation
-	TMap<FName, int32> Combined = BaseStock;
+	// Merge run pickups into base stock for the loss calculation.
+	TMap<FIngredientInstance, int32> Combined = BaseStock;
 	for (auto& Pair : RunPickups)
 	{
 		Combined.FindOrAdd(Pair.Key) += Pair.Value;
@@ -173,8 +186,9 @@ void UCapsInventoryComponent::HandleDeath()
 	RunPickups.Empty();
 	ActiveMeal.Empty();
 
-	// Flatten to individual items so each unit has an equal chance of being lost
-	TArray<FName> ItemPool;
+	// Flatten to individual items so each unit has an equal chance of being lost.
+	// Quality is preserved — a Prime Pepper and a Table Pepper are separate entries.
+	TArray<FIngredientInstance> ItemPool;
 	for (auto& Pair : Combined)
 	{
 		for (int32 i = 0; i < Pair.Value; i++)
@@ -224,8 +238,12 @@ void UCapsInventoryComponent::ApplyDishEffects(ECookingSlot Dish, UAbilitySystem
 		const FIngredientSlotEffect* Effect = Ingredient->SlotEffects.Find(Dish);
 		if (Effect && Effect->GameplayEffect)
 		{
+			// Quality maps to GE level: Crusty=1, Normal=2, Superior=3.
+			// Parametric GEs (stat bumps) read this level via their CurveTable row.
+			// Non-parametric GEs (tag grants like GE_Grant_Fire) ignore level entirely.
+			const float GELevel = static_cast<float>(Slot.Quality);
 			FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
-			FGameplayEffectSpecHandle Spec = ASC->MakeOutgoingSpec(Effect->GameplayEffect, 1.f, Context);
+			FGameplayEffectSpecHandle Spec = ASC->MakeOutgoingSpec(Effect->GameplayEffect, GELevel, Context);
 			if (Spec.IsValid())
 			{
 				ASC->ApplyGameplayEffectSpecToSelf(*Spec.Data.Get());

@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Cooking/CookingTypes.h"
 #include "CapsIngredientPickupActor.generated.h"
 
 class USphereComponent;
@@ -32,6 +33,12 @@ public:
 	// PrimaryAssetId. Set this when spawning from BP_OnDropLoot.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Pickup")
 	FName IngredientID;
+
+	// Quality tier of this pickup. Set by the loot table when spawning.
+	// Drives GE level when the ingredient is slotted and eaten.
+	// Also used by BP_IngredientPickup to set visual differentiation (color, glow, particles).
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Pickup")
+	EIngredientQuality Quality = EIngredientQuality::Choice;
 
 	// Number of units granted on pickup. Rolled from FLootEntry::MinCount/MaxCount
 	// before spawning; just stored here for display and transfer.
