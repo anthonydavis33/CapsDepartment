@@ -57,10 +57,9 @@ protected:
 
 	// ── Blueprint interface ────────────────────────────────────────────────────
 
-	// Implement the ability here. CommitAbility (cost + cooldown) has already
-	// succeeded by the time this fires. Call FinishAbility() when done.
-	UFUNCTION(BlueprintImplementableEvent, Category="Ability", DisplayName="Activate Ability")
-	void BP_ActivateAbility();
+	// Implement the ability here in Blueprint via "Event ActivateAbility".
+	// CommitAbility (cost + cooldown) has already succeeded by the time this fires.
+	// Call FinishAbility() when done. This is the standard GAS K2_ActivateAbility event.
 
 	// Call this when the ability is fully complete (animation finished, projectile
 	// spawned, etc.). Safe to call multiple times — only the first call acts.

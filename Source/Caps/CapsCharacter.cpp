@@ -61,6 +61,12 @@ void ACapsCharacter::BeginPlay()
 			.AddUObject(this, &ACapsCharacter::OnHealthChanged);
 
 		GrantDefaultAbilities();
+
+		UE_LOG(LogTemp, Warning, TEXT("CapsCharacter BeginPlay: ASC init done. DefaultAbilities count: %d"), DefaultAbilities.Num());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("CapsCharacter BeginPlay: AbilitySystemComponent is NULL!"));
 	}
 }
 
@@ -68,12 +74,23 @@ void ACapsCharacter::GrantDefaultAbilities()
 {
 	for (const TSubclassOf<UCapsGameplayAbility>& AbilityClass : DefaultAbilities)
 	{
-		AbilitySystemComponent->GrantAbility(AbilityClass);
+		FGameplayAbilitySpecHandle Handle = AbilitySystemComponent->GrantAbility(AbilityClass);
+		UE_LOG(LogTemp, Warning, TEXT("GrantDefaultAbilities: %s → handle valid: %d"),
+			AbilityClass ? *AbilityClass->GetName() : TEXT("NULL"), Handle.IsValid());
 	}
 }
 
 void ACapsCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
 {
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			static_cast<int32>(GetUniqueID()),   // stable key per actor — overwrites the previous line for this actor
+			3.f,
+			FColor::Green,
+			FString::Printf(TEXT("%s HP: %.0f"), *GetName(), Data.NewValue));
+	}
+
 	if (bIsDead || Data.NewValue > 0.f) return;
 	HandleDeath();
 }

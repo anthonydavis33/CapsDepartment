@@ -18,6 +18,8 @@ void UCapsGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData)
 {
+	UE_LOG(LogTemp, Warning, TEXT("ActivateAbility: %s"), *GetName());
+
 	// Cache context so FinishAbility / CancelAbility can call EndAbility.
 	CachedHandle         = Handle;
 	CachedActorInfo      = ActorInfo;
@@ -28,11 +30,12 @@ void UCapsGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	// (e.g. not enough resource, still on cooldown) end immediately.
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
+		UE_LOG(LogTemp, Error, TEXT("ActivateAbility: CommitAbility FAILED for %s"), *GetName());
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
 
-	BP_ActivateAbility();
+	K2_ActivateAbility();
 }
 
 void UCapsGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,

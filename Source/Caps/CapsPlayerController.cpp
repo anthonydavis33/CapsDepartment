@@ -65,7 +65,9 @@ UCapsAbilitySystemComponent* ACapsPlayerController::GetPlayerASC() const
 
 void ACapsPlayerController::OnAttack1()
 {
-	if (UCapsAbilitySystemComponent* ASC = GetPlayerASC())
+	UCapsAbilitySystemComponent* ASC = GetPlayerASC();
+	UE_LOG(LogTemp, Warning, TEXT("OnAttack1 fired — ASC: %s"), ASC ? TEXT("valid") : TEXT("NULL"));
+	if (ASC)
 		ASC->PressInputID(ECapsAbilityInputID::Attack1);
 }
 
