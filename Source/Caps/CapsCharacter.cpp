@@ -35,6 +35,9 @@ ACapsCharacter::ACapsCharacter()
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false;
 
+	// Don't carve a hole in the navmesh — enemies need to path to the player's location.
+	GetCapsuleComponent()->SetCanEverAffectNavigation(false);
+
 	AbilitySystemComponent = CreateDefaultSubobject<UCapsAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(false);
 
@@ -59,6 +62,12 @@ void ACapsCharacter::BeginPlay()
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
 			UCapsAttributeSet::GetHealthAttribute())
 			.AddUObject(this, &ACapsCharacter::OnHealthChanged);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			UCapsAttributeSet::GetMoveSpeedAttribute())
+			.AddUObject(this, &ACapsCharacter::OnMoveSpeedChanged);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+			UCapsAttributeSet::GetAttackDamageAttribute())
+			.AddUObject(this, &ACapsCharacter::OnAttackDamageChanged);
 
 		GrantDefaultAbilities();
 
@@ -93,6 +102,28 @@ void ACapsCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
 
 	if (bIsDead || Data.NewValue > 0.f) return;
 	HandleDeath();
+}
+
+void ACapsCharacter::OnMoveSpeedChanged(const FOnAttributeChangeData& Data)
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			static_cast<int32>(GetUniqueID()) + 1,
+			3.f, FColor::Cyan,
+			FString::Printf(TEXT("%s Speed: %.0f"), *GetName(), Data.NewValue));
+	}
+}
+
+void ACapsCharacter::OnAttackDamageChanged(const FOnAttributeChangeData& Data)
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			static_cast<int32>(GetUniqueID()) + 2,
+			3.f, FColor::Orange,
+			FString::Printf(TEXT("%s ATK: %.0f"), *GetName(), Data.NewValue));
+	}
 }
 
 void ACapsCharacter::HandleDeath()

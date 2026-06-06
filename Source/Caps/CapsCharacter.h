@@ -72,6 +72,8 @@ private:
 	bool bIsDead = false;
 
 	void OnHealthChanged(const FOnAttributeChangeData& Data);
+	void OnMoveSpeedChanged(const FOnAttributeChangeData& Data);
+	void OnAttackDamageChanged(const FOnAttributeChangeData& Data);
 	void HandleDeath();
 	void GrantDefaultAbilities();
 };
