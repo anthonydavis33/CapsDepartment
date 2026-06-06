@@ -47,6 +47,7 @@ enum class ESubSlotType : uint8
 UENUM(BlueprintType)
 enum class EIngredientQuality : uint8
 {
+	None   = 0  UMETA(DisplayName="None (unassigned)"),
 	Table  = 1  UMETA(DisplayName="Table"),
 	Choice = 2  UMETA(DisplayName="Choice"),
 	Prime  = 3  UMETA(DisplayName="Prime"),

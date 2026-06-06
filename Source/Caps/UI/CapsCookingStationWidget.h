@@ -53,9 +53,11 @@ protected:
 	void BP_OnEatFailed();
 
 	// Called by RefreshInventoryDisplay — rebuild ingredient card widgets from Stock.
-	// Stock maps IngredientID → quantity available in BaseStock.
+	// Stock maps FIngredientInstance (IngredientID + Quality) → quantity.
+	// In Blueprint, iterate the map to build one card per entry.
+	// Use GetDisplayName on the Quality enum + Ingredient->DisplayName to label each card.
 	UFUNCTION(BlueprintImplementableEvent, Category="CookingStation")
-	void OnInventoryRefreshed(const TMap<FName, int32>& Stock);
+	void OnInventoryRefreshed(const TMap<FIngredientInstance, int32>& Stock);
 
 private:
 	UPROPERTY()

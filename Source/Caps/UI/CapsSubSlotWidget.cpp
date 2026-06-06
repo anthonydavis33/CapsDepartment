@@ -23,6 +23,7 @@ void UCapsSubSlotWidget::NativeConstruct()
 				return S.SubSlot == SubSlot && S.SubSlotIndex == SubSlotIndex;
 			});
 		CurrentIngredientID = Found ? Found->IngredientID : NAME_None;
+		CurrentQuality      = Found ? Found->Quality      : EIngredientQuality::Choice;
 	}
 
 	OnSlotContentChanged(CurrentIngredientID);
@@ -47,6 +48,7 @@ void UCapsSubSlotWidget::NativeOnDragDetected(const FGeometry& /*InGeometry*/,
 
 	UCapsDragDropOperation* Op = NewObject<UCapsDragDropOperation>(this);
 	Op->IngredientID  = CurrentIngredientID;
+	Op->Quality       = CurrentQuality;
 	Op->SourceSubSlot = this;
 	Op->DefaultDragVisual = this;
 
@@ -69,7 +71,7 @@ bool UCapsSubSlotWidget::NativeOnDrop(const FGeometry& /*InGeometry*/,
 	if (Op->SourceSubSlot && Op->SourceSubSlot != this)
 		Op->SourceSubSlot->ClearSlot();
 
-	SetSlotIngredient(Op->IngredientID);
+	SetSlotIngredient(Op->IngredientID, Op->Quality);
 	return true;
 }
 
@@ -87,15 +89,16 @@ void UCapsSubSlotWidget::NativeOnDragLeave(const FDragDropEvent& /*InDragDropEve
 		OnDragHoverEnd();
 }
 
-void UCapsSubSlotWidget::SetSlotIngredient(FName IngredientID)
+void UCapsSubSlotWidget::SetSlotIngredient(FName IngredientID, EIngredientQuality Quality)
 {
 	if (!CachedInventory) return;
 
 	// Slot returns false when the ingredient isn't in BaseStock — don't update display.
-	if (!CachedInventory->SlotIngredient(IngredientID, DishSlot, SubSlot, SubSlotIndex))
+	if (!CachedInventory->SlotIngredient(IngredientID, Quality, DishSlot, SubSlot, SubSlotIndex))
 		return;
 
 	CurrentIngredientID = IngredientID;
+	CurrentQuality      = Quality;
 	OnSlotContentChanged(CurrentIngredientID);
 }
 

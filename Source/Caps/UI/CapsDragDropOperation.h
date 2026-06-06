@@ -22,6 +22,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category="DragDrop")
 	FName IngredientID;
 
+	// Quality tier of the ingredient being dragged.
+	UPROPERTY(BlueprintReadWrite, Category="DragDrop")
+	EIngredientQuality Quality = EIngredientQuality::Choice;
+
 	// The sub-slot this drag originated from. Null if dragging from the inventory grid.
 	// On a successful drop the destination slot will call UnslotIngredient on this.
 	UPROPERTY(BlueprintReadWrite, Category="DragDrop")

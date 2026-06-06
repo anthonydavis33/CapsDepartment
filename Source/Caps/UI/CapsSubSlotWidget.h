@@ -37,6 +37,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category="SubSlot")
 	FName CurrentIngredientID;
 
+	// Quality of the current ingredient. Read this in OnSlotContentChanged to
+	// show the quality badge (Table / Choice / Prime) on the slot display.
+	UPROPERTY(BlueprintReadOnly, Category="SubSlot")
+	EIngredientQuality CurrentQuality = EIngredientQuality::Choice;
+
 	// Remove the ingredient, return it to BaseStock, and refresh the visual.
 	UFUNCTION(BlueprintCallable, Category="SubSlot")
 	void ClearSlot();
@@ -74,5 +79,5 @@ private:
 	UPROPERTY()
 	TObjectPtr<UCapsInventoryComponent> CachedInventory;
 
-	void SetSlotIngredient(FName IngredientID);
+	void SetSlotIngredient(FName IngredientID, EIngredientQuality Quality);
 };

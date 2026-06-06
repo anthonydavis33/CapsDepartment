@@ -238,10 +238,11 @@ void UCapsInventoryComponent::ApplyDishEffects(ECookingSlot Dish, UAbilitySystem
 		const FIngredientSlotEffect* Effect = Ingredient->SlotEffects.Find(Dish);
 		if (Effect && Effect->GameplayEffect)
 		{
-			// Quality maps to GE level: Crusty=1, Normal=2, Superior=3.
+			// Quality maps to GE level: Table=1, Choice=2, Prime=3.
 			// Parametric GEs (stat bumps) read this level via their CurveTable row.
 			// Non-parametric GEs (tag grants like GE_Grant_Fire) ignore level entirely.
-			const float GELevel = static_cast<float>(Slot.Quality);
+			// Clamp to 1 minimum — Level 0 is invalid in GAS.
+			const float GELevel = FMath::Max(1.f, static_cast<float>(Slot.Quality));
 			FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
 			FGameplayEffectSpecHandle Spec = ASC->MakeOutgoingSpec(Effect->GameplayEffect, GELevel, Context);
 			if (Spec.IsValid())
